@@ -10,16 +10,19 @@ namespace AutoRandomLocationPoster
         static void Main(string[] args)
         {
             HttpClient client = new HttpClient();
-            string url = "yourURL";
-            long patrolID = 0;
+            string url = "http://local.drive.pt:10122/drive.webapi.mobile/api/patrol/SubmitLocationToDirectionCalculation";
+            long patrolID = 5;
+            int patrolRange = 10;
 
             while (true)
             {
+                long patrol = GetRandomPatrol(patrolID, patrolRange);
+
                 var coord = GetLatLonRandomValue();
 
                 Console.WriteLine("Latitude -> " + coord.Item1 + "; Longitude -> " + coord.Item2);
 
-                PostRequest(client, patrolID, coord.Item1, coord.Item2, url);
+                PostRequest(client, patrol, coord.Item1, coord.Item2, url);
 
                 Thread.Sleep(1000);
             }
@@ -33,6 +36,12 @@ namespace AutoRandomLocationPoster
             double lon = -8 - rand.Next(5577, 7152) * 0.0001;
 
             return (lat, lon);
+        }
+
+        public static long GetRandomPatrol(long patrolID, int patrolIDRange)
+        {
+            var rand = new Random(DateTime.Now.Second);
+            return rand.Next((int)patrolID, (int)(patrolID+(long)patrolIDRange));
         }
 
         public static async void PostRequest(HttpClient client, long patrolID, double latitude, double longitude, string url)
